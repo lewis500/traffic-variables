@@ -61,7 +61,7 @@ const App: FunctionComponent<{}> = () => {
       <Grid item>
         <Paper elevation={2} className={classes.paper}>
           <Button
-            component='div'
+            component="div"
             className={classes.button}
             variant="contained"
             color="secondary"
@@ -69,8 +69,11 @@ const App: FunctionComponent<{}> = () => {
           >
             {play ? "PAUSE" : "PLAY"}
           </Button>
+          <div className={classes.sliderLabel}>
+            <TeX math="k \; \text{(veh/km)}" /> density
+          </div>
           <StyleSlider
-            component='div'
+            component="div"
             onChange={(e, payload: number) =>
               dispatch({ type: AT.SET_K, payload })
             }
@@ -79,19 +82,22 @@ const App: FunctionComponent<{}> = () => {
             min={0}
             max={params.kj}
           />
+          <div className={classes.sliderLabel}>
+            <TeX math="t \; (s)" /> time
+          </div>
           <StyleSlider
-            component='div'
+            component="div"
             onChange={(e, payload: number) =>
               dispatch({ type: AT.SET_TIME, payload })
             }
             value={state.time}
-            step={params.cycle / 100}
+            step={params.cycle / 300}
             min={0}
             max={params.cycle}
           />
         </Paper>
       </Grid>
-      <Grid item style={{ height: "600px" }}>
+      <Grid item className={classes.spaceTimeContainer}>
         <SpaceTime />
       </Grid>
       {/* <SpaceTime /> */}
@@ -116,16 +122,27 @@ const useStyles = makeStyles({
       padding: "0 !important",
       fontFamily: " 'Puritan', sans-serif",
       color: colors.grey["800"]
+    },
+    ".katex": {
+      fontSize: "1em"
     }
+  },
+  spaceTimeContainer: {
+    height: "450px"
   },
   main: {
     maxWidth: "700px",
     margin: "0 auto"
   },
+  sliderLabel: {
+    fontSize: "14px",
+    marginTop: "5px"
+  },
   paper: {
     display: "flex",
     justifyContent: "center",
-    flexDirection: 'column'
+    flexDirection: "column",
+    padding: "10px 30px"
   },
   button: {
     margin: "5px"

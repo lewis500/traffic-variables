@@ -4,7 +4,8 @@ import React, {
   useMemo,
   FC,
   memo,
-  useRef
+  useRef,
+  useLayoutEffect
 } from "react";
 import { scaleLinear, ScaleLinear } from "d3-scale";
 import { AppContext, getLines, getCars, getKDots, getQDots } from "src/ducks";
@@ -15,6 +16,14 @@ import mo from "memoize-one";
 import TexLabel from "src/components/TexLabel";
 import useElementSize from "src/useElementSizeHook";
 import Arrow from "src/components/Arrow";
+import "d3-transition";
+import { select } from "d3-selection";
+import {
+  easeCubicInOut,
+  easeCubicOut,
+  easeBackOut,
+  easeCubicIn
+} from "d3-ease";
 
 const M = {
     top: 25,
@@ -50,6 +59,40 @@ const Lines = React.memo(({ xScale, tScale, k, lineClass }: LinesProps) => (
     ))}
   </g>
 ));
+
+type DotProps = {
+  xScale: ScaleLinear<number, number>;
+  tScale: ScaleLinear<number, number>;
+  t: number;
+  x: number;
+  time: number;
+  play: boolean;
+  className: string;
+};
+
+const Dot = React.memo(({ time, xScale, tScale, t, x, className, play }: DotProps) => {
+  const ref = useRef<SVGCircleElement>();
+  useLayoutEffect(() => {
+    if (Math.abs(time - t) < 2)
+      select(ref.current)
+        .attr("r", 0)
+        .transition()
+        .ease(easeCubicOut)
+        .duration(350)
+        .attr("r", 7)
+        .attr("stroke-width", 4)
+        .transition()
+        .duration(300)
+        .ease(easeCubicOut)
+        .attr("stroke-width", null)
+        .attr("r", 4);
+    else select(ref.current).attr("r", 4);
+  }, []);
+
+  return (
+    <circle ref={ref} className={className} cx={tScale(t)} cy={xScale(x)} />
+  );
+});
 
 const marginer = ({ width, height }: { width: number; height: number }) => ({
   width: Math.max(width - M.left - M.right, 0),
@@ -103,24 +146,33 @@ export default () => {
                 y={xScale(params.xCut + params.X)}
                 x={tScale(params.tCut)}
               />
-              {getKDots(state.k).map((x, i) => (
-                <circle
-                  key={i}
-                  className={classes.kdot}
-                  r="3"
-                  cx={tScale(params.tCut)}
-                  cy={xScale(x)}
-                />
-              ))}
-              {getQDots(state.k).map((t, i) => (
-                <circle
-                  key={i}
-                  className={classes.kdot}
-                  r="3"
-                  cy={xScale(params.xCut)}
-                  cx={tScale(t)}
-                />
-              ))}
+              {state.time >= params.tCut &&
+                getKDots(state.k).map((x, i) => (
+                  <Dot
+                    key={x}
+                    x={x}
+                    t={params.tCut}
+                    tScale={tScale}
+                    xScale={xScale}
+                    time={state.time}
+                    play={state.play}
+                    className={classes.kdot}
+                  />
+                ))}
+              {getQDots(state.k)
+                .filter(t => t <= state.time)
+                .map((t, i) => (
+                  <Dot
+                    key={t}
+                    x={params.xCut}
+                    t={t}
+                    tScale={tScale}
+                    xScale={xScale}
+                    time={state.time}
+                    play={state.play}
+                    className={classes.qdot}
+                  />
+                ))}
             </g>
             <g id="g-lane" transform={`translate(${tScale(state.time)},0)`}>
               <g id="g-cars">
@@ -142,6 +194,7 @@ export default () => {
               d={`M0,0L0,${height}`}
               fill="none"
               stroke="black"
+              className={classes.axis}
               markerStart="url(#arrow)"
             />
             <TexLabel dx={-10} dy={-25} latexstring="x \; \text{(m)}" />
@@ -153,6 +206,7 @@ export default () => {
               fill="none"
               stroke="black"
               markerEnd="url(#arrow)"
+              className={classes.axis}
             />
             <TexLabel dx={width - 15} dy={5} latexstring="t \; \text{(s)}" />
           </g>
@@ -175,8 +229,9 @@ const useStyles = makeStyles({
     height: "100%"
   },
   line: {
-    strokeWidth: "1px",
-    stroke: colors.lightBlue["A400"]
+    strokeWidth: "1.5px",
+    stroke: colors.lightBlue["A400"],
+    strokeDasharray:'2,2'
   },
   svg: {
     width: "100%",
@@ -190,11 +245,12 @@ const useStyles = makeStyles({
     stroke: colors.grey["700"],
     strokeWidth: "2px",
     fill: colors.green["A200"],
-    fillOpacity: 0.3
+    fillOpacity: 0.2
   },
   car: {
-    fill: colors.purple["A200"],
-    stroke: colors.grey["800"]
+    fill: colors.purple["A400"],
+    // stroke: 'black'
+    // stroke: colors.grey["800"]
   },
   masked: {
     mask: "url(#myMask2)"
@@ -206,8 +262,17 @@ const useStyles = makeStyles({
     stroke: colors.grey["300"]
     // opacity: .95
   },
-  kdot: {
+  axis: {
+    strokeWidth: "2px",
+    color: colors.grey["800"]
+  },
+  qdot: {
     fill: colors.pink.A400,
+    stroke: "white",
+    strokeWidth: "2px"
+  },
+  kdot: {
+    fill: colors.orange.A700,
     stroke: "white",
     strokeWidth: "2px"
   },

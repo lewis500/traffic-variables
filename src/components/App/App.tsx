@@ -7,63 +7,39 @@ import React, {
 } from "react";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
 import { useTimer } from "src/useTimerHook";
-import * as params from "src/constants";
+import * as params from "src/params";
 import {
   AppContext,
   reducer,
   initialState,
-  ActionTypes as AT,
-  VKType,
-  ActionTypes
+  ActionTypes as AT
 } from "src/ducks";
-import VK from "src/components/VK";
-import QK from "src/components/QK";
-import useStyles from "./styleApp";
+// import SpaceTime from "src/components/SpaceTime";
+// import useStyles from "./styleApp";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormLabel from "@material-ui/core/FormLabel";
+import * as colors from "@material-ui/core/colors";
+import makeStyles from "@material-ui/styles/makeStyles";
+import { Grid } from "@material-ui/core";
+import SpaceTime from "../SpaceTime";
+import { withStyles, Theme } from "@material-ui/core/styles";
+import { Typography as Text } from "@material-ui/core";
+import TeX from "@matejmazur/react-katex";
+import "katex/dist/katex.min.css";
+import Slider from "@material-ui/core/Slider";
 
-const Buttons = React.memo(
-  ({
-    changeVK,
-    vk
-  }: {
-    vk: VKType;
-    changeVK: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  }) => (
-    <RadioGroup
-      row={true}
-      aria-label="Fundamental Diagram"
-      name="fd"
-      value={vk}
-      onChange={changeVK}
-    >
-      <FormControlLabel
-        value={VKType.TRIANGLE}
-        control={<Radio />}
-        label="Triangle"
-      />
-      <FormControlLabel
-        value={VKType.GREENSHIELDS}
-        control={<Radio />}
-        label="Greenshields"
-      />
-      <FormControlLabel
-        value={VKType.DRAKE}
-        control={<Radio />}
-        label="Drake"
-      />
-    </RadioGroup>
-  )
-);
+const StyleSlider = withStyles((theme: Theme) => ({
+  root: {
+    color: theme.palette.primary.main,
+    marginBottom: "15px"
+  }
+}))(Slider);
 
-const EMPTY = {},
-  WIDTH = 600,
-  HEIGHT = WIDTH / params.GR;
+const EMPTY = {};
 const App: FunctionComponent<{}> = () => {
   const { state, dispatch } = useContext(AppContext),
     { play } = state,
@@ -71,33 +47,52 @@ const App: FunctionComponent<{}> = () => {
 
   useTimer((dt: number) => {
     dt /= params.delta;
-    dispatch({ type: AT.TICK, payload: Math.min(dt, 0.05) });
+    dispatch({ type: AT.TICK, payload: dt });
   }, play);
 
-  const changeVK = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // if (!VKType.hasOwnProperty(e.currentTarget.value))
-    //   throw Error("wrong input event");
-    let payload = e.currentTarget.value as VKType;
-    dispatch({ type: ActionTypes.SET_VK, payload });
-  }, []);
-
   return (
-    <div className={classes.main}>
-      <Paper className={classes.paper} elevation={2}>
-        {/* <Sliders /> */}
-        <Button
-          className={classes.button}
-          variant="contained"
-          color="secondary"
-          onClick={() => dispatch({ type: AT.SET_PLAY, payload: !play })}
-        >
-          {play ? "PAUSE" : "PLAY"}
-        </Button>
-        <Buttons changeVK={changeVK} vk={state.vk} />
-      </Paper>
-      <VK height={HEIGHT} width={WIDTH} />
-      <QK />
-    </div>
+    <Grid
+      direction="column"
+      container
+      className={classes.main}
+      alignItems="stretch"
+      spacing={3}
+    >
+      <Grid item>
+        <Paper elevation={2} className={classes.paper}>
+          <Button
+            className={classes.button}
+            variant="contained"
+            color="secondary"
+            onClick={() => dispatch({ type: AT.SET_PLAY, payload: !play })}
+          >
+            {play ? "PAUSE" : "PLAY"}
+          </Button>
+          <StyleSlider
+            onChange={(e, payload: number) =>
+              dispatch({ type: AT.SET_K, payload })
+            }
+            value={state.k}
+            step={params.kj / 100}
+            min={0}
+            max={params.kj}
+          />
+          <StyleSlider
+            onChange={(e, payload: number) =>
+              dispatch({ type: AT.SET_TIME, payload })
+            }
+            value={state.time}
+            step={params.cycle / 100}
+            min={0}
+            max={params.cycle}
+          />
+        </Paper>
+      </Grid>
+      <Grid item style={{ height: "600px" }}>
+        <SpaceTime />
+      </Grid>
+      {/* <SpaceTime /> */}
+    </Grid>
   );
 };
 
@@ -110,3 +105,30 @@ export default () => {
     </AppContext.Provider>
   );
 };
+
+const useStyles = makeStyles({
+  "@global": {
+    body: {
+      margin: "0 !important",
+      padding: "0 !important",
+      fontFamily: " 'Puritan', sans-serif",
+      color: colors.grey["800"]
+    }
+  },
+  main: {
+    maxWidth: "700px",
+    margin: "0 auto"
+  },
+  paper: {
+    display: "flex",
+    justifyContent: "center"
+  },
+  button: {
+    margin: "5px"
+  },
+  sliderContainer: {
+    width: "300px",
+    padding: "20px",
+    boxSizing: "border-box"
+  }
+});

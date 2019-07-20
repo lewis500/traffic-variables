@@ -1,12 +1,13 @@
 import React, { useContext, FunctionComponent } from "react";
 import { withStyles, Theme } from "@material-ui/core/styles";
-import { AppContext } from "src/ducks";
+import { AppContext, ActionTypes } from "src/ducks";
 import Slider from "@material-ui/lab/Slider";
 import { Typography as Text, colors } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import TeX from "@matejmazur/react-katex";
-import * as params from "src/constants";
+import * as params from "src/params";
 import "katex/dist/katex.min.css";
+// import 
 
 const StyleSlider = withStyles((theme: Theme) => ({
   root: {
@@ -48,7 +49,7 @@ const Sliders: FunctionComponent = () => {
     <>
       {xText}
       <StyleSlider
-        onChange={(e, payload: number) => dispatch({ type: "SET_X", payload })}
+        onChange={(e, payload: number) => dispatch({ type: ActionTypes.SET_K, payload })}
         value={x}
         step={1}
         min={0}

@@ -14,8 +14,7 @@ const getSize = (el: HTMLElement):Size =>
     ? { width: 0, height: 0 }
     : { width: el.offsetWidth, height: el.offsetHeight };
 export default function useComponentSize(
-  ref: React.RefObject<HTMLElement>,
-  transform?: (v: Size) => Size
+  ref: React.RefObject<HTMLElement>
 ) {
   const [size, setSize] = useState(getSize(ref ? ref.current : null));
 
@@ -34,5 +33,5 @@ export default function useComponentSize(
     return () => window.removeEventListener("resize", handleResize);
   }, [ref.current]);
 
-  return transform ? transform(size) : size;
+  return size;
 }

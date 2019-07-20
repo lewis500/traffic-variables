@@ -61,6 +61,7 @@ const App: FunctionComponent<{}> = () => {
       <Grid item>
         <Paper elevation={2} className={classes.paper}>
           <Button
+            component='div'
             className={classes.button}
             variant="contained"
             color="secondary"
@@ -69,6 +70,7 @@ const App: FunctionComponent<{}> = () => {
             {play ? "PAUSE" : "PLAY"}
           </Button>
           <StyleSlider
+            component='div'
             onChange={(e, payload: number) =>
               dispatch({ type: AT.SET_K, payload })
             }
@@ -78,6 +80,7 @@ const App: FunctionComponent<{}> = () => {
             max={params.kj}
           />
           <StyleSlider
+            component='div'
             onChange={(e, payload: number) =>
               dispatch({ type: AT.SET_TIME, payload })
             }
@@ -121,7 +124,8 @@ const useStyles = makeStyles({
   },
   paper: {
     display: "flex",
-    justifyContent: "center"
+    justifyContent: "center",
+    flexDirection: 'column'
   },
   button: {
     margin: "5px"

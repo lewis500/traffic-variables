@@ -76,8 +76,25 @@ export default () => {
           <mask id="myMask2">
             <rect width={width} height={height} fill="white" />
           </mask>
+          <mask id="myMask3">
+            <rect width={tScale(state.time)} height={height} fill="white" />
+          </mask>
           <g id="g-masked" mask="url(#myMask2)">
-            {CE(Lines, { xScale, tScale, k: state.k, lineClass: classes.line })}
+            {CE("path", {
+              className: classes.road,
+              strokeWidth: height - xScale(params.roadWidth),
+              d: `M0,0L0,${height}`,
+              transform: `translate(${tScale(state.time)},0)`
+            })}
+            {/* {CE(Lines, { xScale, tScale, k: state.k, lineClass: classes.line })} */}
+            <g className={classes.maskedLines} mask="url(#myMask3)">
+              {CE(Lines, {
+                xScale,
+                tScale,
+                k: state.k,
+                lineClass: classes.line
+              })}
+            </g>
             <g id="g-cut">
               <rect
                 className={classes.cut}
@@ -106,11 +123,6 @@ export default () => {
               ))}
             </g>
             <g id="g-lane" transform={`translate(${tScale(state.time)},0)`}>
-              {CE("path", {
-                className: classes.road,
-                strokeWidth: height - xScale(params.roadWidth),
-                d: `M0,0L0,${height}`
-              })}
               <g id="g-cars">
                 {getCars(state.k, state.time).map((x, i) => (
                   <rect
@@ -181,11 +193,14 @@ const useStyles = makeStyles({
     fillOpacity: 0.3
   },
   car: {
-    fill: colors.purple["A400"],
-    stroke: "none"
+    fill: colors.purple["A200"],
+    stroke: colors.grey["800"]
   },
   masked: {
     mask: "url(#myMask2)"
+  },
+  maskedLines: {
+    mask: "url(#myMask3)"
   },
   road: {
     stroke: colors.grey["300"]

@@ -28,12 +28,11 @@ import Slider from "@material-ui/core/Slider";
 const StyleSlider = withStyles((theme: Theme) => ({
   root: {
     color: theme.palette.primary.main,
-    marginBottom: "15px"
+    marginBottom: "5px",
   }
 }))(Slider);
 
-const EMPTY = {};
-const App: FunctionComponent<{}> = () => {
+const Controls = () => {
   const { state, dispatch } = useContext(AppContext),
     { play } = state,
     classes = useStyles(EMPTY);
@@ -44,6 +43,48 @@ const App: FunctionComponent<{}> = () => {
   }, play);
 
   return (
+    <Paper elevation={2} className={classes.paper}>
+      <Button
+        component="div"
+        className={classes.button}
+        variant="contained"
+        color="secondary"
+        onClick={() => dispatch({ type: AT.SET_PLAY, payload: !play })}
+      >
+        {play ? "PAUSE" : "PLAY"}
+      </Button>
+      <div className={classes.sliderLabel} style={{marginTop: 15}}>
+        density <TeX math="k \; \text{(veh/km)}" /> 
+      </div>
+      <StyleSlider
+        component="div"
+        onChange={(e, payload: number) => dispatch({ type: AT.SET_K, payload })}
+        value={state.k}
+        step={params.kj / 300}
+        min={0}
+        max={params.kj}
+      />
+      <div className={classes.sliderLabel}>
+        time <TeX math="t \; (s)" />
+      </div>
+      <StyleSlider
+        component="div"
+        onChange={(e, payload: number) =>
+          dispatch({ type: AT.SET_TIME, payload })
+        }
+        value={state.time}
+        step={params.cycle / 300}
+        min={0}
+        max={params.cycle}
+      />
+    </Paper>
+  );
+};
+
+const EMPTY = {};
+const App: FunctionComponent<{}> = () => {
+  const classes = useStyles(EMPTY);
+  return (
     <Grid
       direction="column"
       container
@@ -51,52 +92,15 @@ const App: FunctionComponent<{}> = () => {
       alignItems="stretch"
       spacing={3}
     >
-      <Grid item>
-        <Paper elevation={2} className={classes.paper}>
-          <Button
-            component="div"
-            className={classes.button}
-            variant="contained"
-            color="secondary"
-            onClick={() => dispatch({ type: AT.SET_PLAY, payload: !play })}
-          >
-            {play ? "PAUSE" : "PLAY"}
-          </Button>
-          <div className={classes.sliderLabel}>
-            <TeX math="k \; \text{(veh/km)}" /> density
-          </div>
-          <StyleSlider
-            component="div"
-            onChange={(e, payload: number) =>
-              dispatch({ type: AT.SET_K, payload })
-            }
-            value={state.k}
-            step={params.kj / 300}
-            min={0}
-            max={params.kj}
-          />
-          <div className={classes.sliderLabel}>
-            <TeX math="t \; (s)" /> time
-          </div>
-          <StyleSlider
-            component="div"
-            onChange={(e, payload: number) =>
-              dispatch({ type: AT.SET_TIME, payload })
-            }
-            value={state.time}
-            step={params.cycle / 300}
-            min={0}
-            max={params.cycle}
-          />
-        </Paper>
-      </Grid>
       <Grid item className={classes.spaceTimeContainer}>
         <SpaceTime />
       </Grid>
       <Grid item className={classes.qkContainer}>
         <QK />
       </Grid>
-      {/* <SpaceTime /> */}
+      <Grid item>
+        <Controls />
+      </Grid>
     </Grid>
   );
 };

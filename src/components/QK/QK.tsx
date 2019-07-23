@@ -6,7 +6,7 @@ import React, {
   memo,
   useRef
 } from "react";
-import { AppContext, QKLine } from "src/ducks";
+import { AppContext, QKLine, qk } from "src/ducks";
 import * as params from "src/params";
 import * as colors from "@material-ui/core/colors";
 import makeStyles from "@material-ui/styles/makeStyles";
@@ -16,8 +16,8 @@ import Arrow from "src/components/Arrow";
 import useScale from "src/useScale";
 
 const M = {
-    top: 25,
-    bottom: 30,
+    top: 20,
+    bottom: 20,
     left: 20,
     right: 10
   },
@@ -35,7 +35,7 @@ export default () => {
     containerRef = useRef<HTMLDivElement>(),
     { width, height } = marginer(useElementSize(containerRef)),
     classes = useStyles(EMPTY),
-    kScale = useScale([0, width], [0, params.kj*1.1], [width]),
+    kScale = useScale([0, width], [0, params.kj * 1.1], [width]),
     qScale = useScale([height, 0], [0, params.q0 * 1.2], [height]),
     QKPath = useMemo(() => {
       let d = "M" + QKLine.map(([k, q]) => [kScale(k), qScale(q)]).join("L");
@@ -49,7 +49,15 @@ export default () => {
           <mask id="myMask4">
             <rect width={width} height={height} fill="white" />
           </mask>
-          <g mask="url(#myMask4)">{QKPath}</g>
+          <g mask="url(#myMask4)">
+            {QKPath}
+            <circle
+              cx={kScale(state.k)}
+              cy={qScale(qk(state.k))}
+              className={classes.dot}
+              r={6}
+            />
+          </g>
           <g id="g-qaxis">
             <path
               d={`M0,0L0,${height}`}
@@ -58,14 +66,11 @@ export default () => {
               className={classes.axis}
               markerStart="url(#arrow)"
             />
-            <TexLabel
-              dx={-10}
-              dy={-25}
-              latexstring="q \; \text{veh/time-unit}"
-            />
+            <TexLabel dy={qScale(params.q0)-12} dx={-15} latexstring="q_0" />
+            <TexLabel dx={-10} dy={-25} latexstring="q \; \text{veh/s}" />
           </g>
 
-          <g transform={`translate(0,${height})`} id="g-kax9s">
+          <g transform={`translate(0,${height})`} id="g-kaxis">
             <path
               d={`M0,0L${width},0`}
               fill="none"
@@ -73,7 +78,19 @@ export default () => {
               markerEnd="url(#arrow)"
               className={classes.axis}
             />
-            <TexLabel dx={width - 15} dy={5} latexstring="t \; \text{(s)}" />
+            {/* <path
+              d={`M0,0L${width},0`}
+              fill="none"
+              stroke="black"
+              markerEnd="url(#arrow)"
+              className={classes.axis}
+            /> */}
+            <TexLabel dx={kScale(params.k0)} dy={0} latexstring="k_0" />
+            <TexLabel
+              dx={width - 70}
+              dy={5}
+              latexstring="k \; \text{(veh/100 m)}"
+            />
           </g>
         </g>
       </svg>
@@ -82,6 +99,11 @@ export default () => {
 };
 
 const useStyles = makeStyles({
+  dot: {
+    fill: colors.pink["500"],
+    stroke: "white",
+    strokeWidth: "2px"
+  },
   path: {
     strokeWidth: "4px",
     fill: "none",

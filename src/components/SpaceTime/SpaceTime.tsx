@@ -27,7 +27,7 @@ import {
 
 const M = {
     top: 25,
-    bottom: 30,
+    bottom: 25,
     left: 20,
     right: 10
   },
@@ -79,14 +79,14 @@ const Dot = React.memo(
         .attr("r", 0)
         .transition()
         .ease(easeCubicOut)
-        .duration(350)
+        .duration(320)
         .attr("r", 7)
         .attr("stroke-width", 4)
         .transition()
         .duration(300)
         .ease(easeCubicOut)
-        .attr("stroke-width", null)
-        .attr("r", 4);
+        .attr("stroke-width", 2)
+        .attr("r", 4.5);
       // else select(ref.current).attr("r", 4);
     }, []);
 
@@ -185,7 +185,7 @@ export default () => {
                   <rect
                     key={i}
                     className={classes.car}
-                    y={xScale(x)}
+                    y={xScale(x)+carLength/6}
                     x={-carWidth / 2}
                     height={carLength}
                     width={carWidth}
@@ -236,7 +236,7 @@ const useStyles = makeStyles({
   line: {
     strokeWidth: "1.5px",
     stroke: colors.lightBlue["A400"],
-    strokeDasharray: "2,2"
+    strokeDasharray: "1,1"
   },
   svg: {
     width: "100%",
@@ -249,13 +249,15 @@ const useStyles = makeStyles({
   cut: {
     stroke: colors.grey["700"],
     strokeWidth: "2px",
-    fill: colors.green["A200"],
-    fillOpacity: 0.2
+    rx: 2,
+    ry:2,
+    fill: colors.amber["A400"],
+    fillOpacity: 0.15
   },
   car: {
-    fill: colors.purple["A400"]
+    fill: colors.purple["A200"],
     // stroke: 'black'
-    // stroke: colors.grey["800"]
+    // stroke: colors.grey["100"]
   },
   masked: {
     mask: "url(#myMask2)"
@@ -277,7 +279,7 @@ const useStyles = makeStyles({
     strokeWidth: "2px"
   },
   kdot: {
-    fill: colors.orange.A700,
+    fill: colors.green.A700,
     stroke: "white",
     strokeWidth: "2px"
   },

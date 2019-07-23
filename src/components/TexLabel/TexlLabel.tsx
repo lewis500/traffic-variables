@@ -6,7 +6,7 @@ export default React.memo<{
   dx: number;
   dy: number;
   latexstring: string;
-}>(({ dx, dy, latexstring }) => (
+}>(({ dx = 0, dy = 0, latexstring = "" }) => (
   <foreignObject width="90" height="75" transform={`translate(${dx}, ${dy})`}>
     <span style={style}>
       <TeX math={latexstring} />

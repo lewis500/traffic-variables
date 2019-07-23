@@ -15,19 +15,12 @@ import {
   initialState,
   ActionTypes as AT
 } from "src/ducks";
-// import SpaceTime from "src/components/SpaceTime";
-// import useStyles from "./styleApp";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormLabel from "@material-ui/core/FormLabel";
 import * as colors from "@material-ui/core/colors";
 import makeStyles from "@material-ui/styles/makeStyles";
 import { Grid } from "@material-ui/core";
-import SpaceTime from "../SpaceTime";
+import SpaceTime from "src/components/SpaceTime";
+import QK from "src/components/QK";
 import { withStyles, Theme } from "@material-ui/core/styles";
-import { Typography as Text } from "@material-ui/core";
 import TeX from "@matejmazur/react-katex";
 import "katex/dist/katex.min.css";
 import Slider from "@material-ui/core/Slider";
@@ -78,7 +71,7 @@ const App: FunctionComponent<{}> = () => {
               dispatch({ type: AT.SET_K, payload })
             }
             value={state.k}
-            step={params.kj / 100}
+            step={params.kj / 300}
             min={0}
             max={params.kj}
           />
@@ -99,6 +92,9 @@ const App: FunctionComponent<{}> = () => {
       </Grid>
       <Grid item className={classes.spaceTimeContainer}>
         <SpaceTime />
+      </Grid>
+      <Grid item className={classes.qkContainer}>
+        <QK />
       </Grid>
       {/* <SpaceTime /> */}
     </Grid>
@@ -126,6 +122,9 @@ const useStyles = makeStyles({
     ".katex": {
       fontSize: "1em"
     }
+  },
+  qkContainer: {
+    height: "250px"
   },
   spaceTimeContainer: {
     height: "450px"

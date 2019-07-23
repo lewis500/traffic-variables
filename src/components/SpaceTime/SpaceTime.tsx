@@ -70,10 +70,11 @@ type DotProps = {
   className: string;
 };
 
-const Dot = React.memo(({ time, xScale, tScale, t, x, className, play }: DotProps) => {
-  const ref = useRef<SVGCircleElement>();
-  useLayoutEffect(() => {
-    if (Math.abs(time - t) < 2)
+const Dot = React.memo(
+  ({ time, xScale, tScale, t, x, className, play }: DotProps) => {
+    const ref = useRef<SVGCircleElement>();
+    useLayoutEffect(() => {
+      // if (Math.abs(time - t) < .5)
       select(ref.current)
         .attr("r", 0)
         .transition()
@@ -86,13 +87,14 @@ const Dot = React.memo(({ time, xScale, tScale, t, x, className, play }: DotProp
         .ease(easeCubicOut)
         .attr("stroke-width", null)
         .attr("r", 4);
-    else select(ref.current).attr("r", 4);
-  }, []);
+      // else select(ref.current).attr("r", 4);
+    }, []);
 
-  return (
-    <circle ref={ref} className={className} cx={tScale(t)} cy={xScale(x)} />
-  );
-});
+    return (
+      <circle ref={ref} className={className} cx={tScale(t)} cy={xScale(x)} />
+    );
+  }
+);
 
 const marginer = ({ width, height }: { width: number; height: number }) => ({
   width: Math.max(width - M.left - M.right, 0),
@@ -147,23 +149,26 @@ export default () => {
                 x={tScale(params.tCut)}
               />
               {state.time >= params.tCut &&
-                getKDots(state.k).map((x, i) => (
-                  <Dot
-                    key={x}
-                    x={x}
-                    t={params.tCut}
-                    tScale={tScale}
-                    xScale={xScale}
-                    time={state.time}
-                    play={state.play}
-                    className={classes.kdot}
-                  />
-                ))}
+                getKDots(state.k)
+                  // .sort((a, b) => b - a)
+                  .map((x, i) => (
+                    <Dot
+                      key={i}
+                      x={x}
+                      t={params.tCut}
+                      tScale={tScale}
+                      xScale={xScale}
+                      time={state.time}
+                      play={state.play}
+                      className={classes.kdot}
+                    />
+                  ))}
               {getQDots(state.k)
                 .filter(t => t <= state.time)
+                // .sort((a, b) => a - b)
                 .map((t, i) => (
                   <Dot
-                    key={t}
+                    key={i}
                     x={params.xCut}
                     t={t}
                     tScale={tScale}
@@ -231,7 +236,7 @@ const useStyles = makeStyles({
   line: {
     strokeWidth: "1.5px",
     stroke: colors.lightBlue["A400"],
-    strokeDasharray:'2,2'
+    strokeDasharray: "2,2"
   },
   svg: {
     width: "100%",
@@ -248,7 +253,7 @@ const useStyles = makeStyles({
     fillOpacity: 0.2
   },
   car: {
-    fill: colors.purple["A400"],
+    fill: colors.purple["A400"]
     // stroke: 'black'
     // stroke: colors.grey["800"]
   },

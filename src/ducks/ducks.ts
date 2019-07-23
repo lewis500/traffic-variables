@@ -67,15 +67,21 @@ export const getKDots = mo((k: number) => {
   const v = vk(k);
   return getLines(k)
     .map(({ x0 }) => x0 + v * params.tCut)
-    .filter(x => x >= params.xCut && x < params.xCut + params.X);
+    .filter(x => x >= params.xCut && x <= params.xCut + params.X)
+    .sort((a,b)=>b-a);
 });
 
 export const getQDots = mo((k: number) => {
   const v = vk(k);
   return getLines(k)
     .map(({ x0 }) => (params.xCut - x0) / v)
-    .filter(t => t >= params.tCut && t < params.tCut + params.T);
+    .filter(t => t >= params.tCut && t <= params.tCut + params.T)
+    .sort((a,b)=>a-b);
 });
+
+export const QKLine = range(0, params.kj * (1 + 1 / 100), params.kj / 100).map(
+  k => [k, qk(k)]
+);
 
 export const reducer: React.Reducer<State, Action> = (state, action) => {
   switch (action.type) {
